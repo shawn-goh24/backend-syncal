@@ -1,9 +1,37 @@
 const db = require("../db/models/index");
 
-const { User } = db;
+const { User, Calendar, UserCalendar } = db;
 
-// Get all user
-async function getUsers(req, res) {
+async function getUser(req, res) {
+  const currUser = req.body.user;
+  try {
+    const [user, created] = await User.findOrCreate({
+      where: { email: currUser.email },
+      defaults: {
+        name: currUser.name,
+        avatarUrl: currUser.picture,
+      },
+    });
+
+    if (created) {
+      const newCalendar = await Calendar.create({
+        name: `${currUser.name}'s Personal`,
+      });
+      await UserCalendar.create({
+        userId: user.id,
+        calendarId: newCalendar.id,
+        roleId: 1,
+      });
+    }
+
+    return res.json(user);
+  } catch (err) {
+    return res.status(400).json({ error: true, msg: err });
+  }
+}
+
+// Get all user (Test Route)
+async function testRoute(req, res) {
   try {
     const users = await User.findAll();
     return res.json(users);
@@ -13,5 +41,6 @@ async function getUsers(req, res) {
 }
 
 module.exports = {
-  getUsers,
+  testRoute,
+  getUser,
 };
