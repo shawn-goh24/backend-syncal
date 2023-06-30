@@ -18,7 +18,7 @@ const initEvent = (sequelize) =>
           key: "id",
         },
       },
-      name: {
+      title: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -26,15 +26,15 @@ const initEvent = (sequelize) =>
         type: DataTypes.STRING,
         allowNull: false,
       },
-      isAllDay: {
+      allDay: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
       },
-      startDatetime: {
+      start: {
         type: DataTypes.DATE,
         allowNull: false,
       },
-      endDatetime: {
+      end: {
         type: DataTypes.DATE,
         allowNull: false,
       },

@@ -12,6 +12,8 @@ const checkJwt = auth({
 });
 
 const usersRouter = require("./routers/UsersRouter");
+const eventsRouter = require("./routers/EventsRouter");
+const calendarsRouter = require("./routers/CalendarsRouter");
 
 // enforce on all endpoints
 // get PORT from .env
@@ -23,6 +25,8 @@ app.use(express.json());
 // app.use(checkJwt);
 
 app.use("/user", usersRouter);
+app.use("/event", eventsRouter);
+app.use("/calendar", calendarsRouter);
 
 app.listen(PORT, () => {
   console.log(`Application listening to port ${PORT}`);
