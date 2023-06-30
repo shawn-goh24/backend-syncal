@@ -1,4 +1,5 @@
 const db = require("../db/models/index");
+const { groupByDate } = require("../utils/utils");
 
 const { User, Event, Calendar } = db;
 
@@ -6,10 +7,26 @@ const { User, Event, Calendar } = db;
 async function getCalendarEvents(req, res) {
   const { id } = req.params;
   try {
-    const calendarEvent = await Calendar.findByPk(id, {
+    const calendarEvents = await Calendar.findByPk(id, {
       include: Event,
     });
-    return res.json(calendarEvent);
+    return res.json(calendarEvents);
+  } catch (err) {
+    return res.status(400).json({ error: true, msg: err });
+  }
+}
+
+// Get all events arrange and group according to dates & time
+async function getEventList(req, res) {
+  const { id } = req.params;
+  try {
+    const calendar = await Calendar.findByPk(id, {
+      include: Event,
+      order: [[Event, "start", "ASC"]],
+    });
+    console.log("groupedEvents");
+    const groupedEvents = groupByDate(calendar.Events);
+    return res.json(groupedEvents);
   } catch (err) {
     return res.status(400).json({ error: true, msg: err });
   }
@@ -17,4 +34,5 @@ async function getCalendarEvents(req, res) {
 
 module.exports = {
   getCalendarEvents,
+  getEventList,
 };
