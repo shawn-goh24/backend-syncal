@@ -6,19 +6,19 @@ const { Event, UserEvent } = db;
 async function addEvent(req, res) {
   const { newEventValues, calendarId, userId } = req.body;
   try {
-    const start = newEventValues.allDay
-      ? newEventValues.startDate
-      : newEventValues.startDateTime;
-    const end = newEventValues.allDay
-      ? newEventValues.endDate
-      : newEventValues.endDateTime;
+    // const start = newEventValues.allDay
+    //   ? newEventValues.startDate
+    //   : newEventValues.startDateTime;
+    // const end = newEventValues.allDay
+    //   ? newEventValues.endDate
+    //   : newEventValues.endDateTime;
 
     const newEvent = await Event.create({
       calendarId: calendarId,
       color: newEventValues.color,
       title: newEventValues.title,
-      start: start,
-      end: end,
+      start: newEventValues.start,
+      end: newEventValues.end,
       description: newEventValues.description,
       location: newEventValues.location,
       allDay: newEventValues.allDay,
@@ -39,7 +39,8 @@ async function addEvent(req, res) {
 
 async function editEvent(req, res) {
   try {
-    const eventToAdd = req.body;
+    console.log(req.body.editedValues);
+    const eventToAdd = req.body.editedValues;
     const eventToReplace = req.params.eventId;
     let eventToEdit = await Event.findByPk(eventToReplace);
     await eventToEdit.update(eventToAdd);

@@ -36,7 +36,7 @@ const initEvent = (sequelize) =>
       },
       end: {
         type: DataTypes.DATE,
-        allowNull: false,
+        // allowNull: false,
       },
       description: {
         type: DataTypes.TEXT,
