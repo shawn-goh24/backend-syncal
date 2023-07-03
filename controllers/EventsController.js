@@ -1,6 +1,6 @@
 const db = require("../db/models/index");
 
-const { Event, UserEvent } = db;
+const { Event, UserEvent, Calendar } = db;
 
 // Get add event - 1. add to Event table, 2. add to UserEvent table
 async function addEvent(req, res) {
@@ -49,8 +49,23 @@ async function editEvent(req, res) {
     return res.status(400).json({ error: true, msg: err });
   }
 }
+async function deleteEvent(req, res) {
+  const { eventId, calendarId } = req.params;
+  try {
+    await Event.destroy({ where: { id: eventId } });
+
+    const allEvents = await Calendar.findByPk(calendarId, {
+      include: Event,
+    });
+
+    return res.json(allEvents);
+  } catch (err) {
+    return res.status(400).json({ error: true, msg: err });
+  }
+}
 
 module.exports = {
   addEvent,
   editEvent,
+  deleteEvent,
 };
