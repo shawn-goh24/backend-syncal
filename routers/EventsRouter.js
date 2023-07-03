@@ -3,6 +3,7 @@ const eventsController = require("../controllers/EventsController");
 
 const router = express.Router();
 
-router.get("/:id", eventsController.getEvents); // Get all events associated with user and calendar
+router.post("/add", eventsController.addEvent); // Add event
+router.put("/edit/:eventId", eventsController.editEvent); // Edit a single event
 
 module.exports = router;
