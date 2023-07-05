@@ -53,8 +53,28 @@ async function addCalendar(req, res) {
   }
 }
 
+// Edit calendar details
+async function editCalendar(req, res) {
+  try {
+    const calendarToAdd = req.body;
+    const calendarToReplace = req.params.calendarId;
+    let calendarToEdit = await Calendar.findByPk(calendarToReplace);
+    await calendarToEdit.update(calendarToAdd);
+
+    const allUserCalendar = await User.findByPk(req.params.userId, {
+      include: Calendar,
+      order: [[{ model: Calendar }, "id", "ASC"]],
+    });
+
+    return res.json(allUserCalendar);
+  } catch (err) {
+    return res.status(400).json({ error: true, msg: err });
+  }
+}
+
 module.exports = {
   getCalendarEvents,
   getEventList,
   addCalendar,
+  editCalendar,
 };

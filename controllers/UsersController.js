@@ -37,6 +37,7 @@ async function getGroup(req, res) {
   try {
     const user = await User.findByPk(id, {
       include: Calendar,
+      order: [[{ model: Calendar }, "id", "ASC"]],
     });
     return res.json(user);
   } catch (err) {
