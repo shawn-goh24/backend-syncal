@@ -1,7 +1,7 @@
 const db = require("../db/models/index");
 const { groupByDate } = require("../utils/utils");
 
-const { User, Event, Calendar } = db;
+const { User, Event, Calendar, UserCalendar } = db;
 
 // Get all user (Test Route)
 async function getCalendarEvents(req, res) {
@@ -32,7 +32,29 @@ async function getEventList(req, res) {
   }
 }
 
+// Add calendar
+async function addCalendar(req, res) {
+  const { name, imageUrl, userId } = req.body;
+  try {
+    const newCalendar = await Calendar.create({
+      name: name,
+      imageUrl: imageUrl,
+    });
+
+    const newUserCalendar = await UserCalendar.create({
+      userId: userId,
+      calendarId: newCalendar.id,
+      roleId: 1,
+    });
+
+    return res.json(newCalendar);
+  } catch (err) {
+    return res.status(400).json({ error: true, msg: err });
+  }
+}
+
 module.exports = {
   getCalendarEvents,
   getEventList,
+  addCalendar,
 };
