@@ -72,9 +72,26 @@ async function editCalendar(req, res) {
   }
 }
 
+async function deleteCalendar(req, res) {
+  const { calendarId, userId } = req.params;
+  try {
+    await Calendar.destroy({ where: { id: calendarId } });
+
+    const allUserCalendar = await User.findByPk(userId, {
+      include: Calendar,
+      order: [[{ model: Calendar }, "id", "ASC"]],
+    });
+
+    return res.json(allUserCalendar);
+  } catch (err) {
+    return res.status(400).json({ error: true, msg: err });
+  }
+}
+
 module.exports = {
   getCalendarEvents,
   getEventList,
   addCalendar,
   editCalendar,
+  deleteCalendar,
 };
