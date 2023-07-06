@@ -125,6 +125,35 @@ async function getInviteDetails(req, res) {
   }
 }
 
+async function addToUserCalendar(req, res) {
+  const { userEmail, calendarId } = req.body;
+  try {
+    const user = await User.findAll({
+      where: {
+        email: userEmail,
+      },
+    });
+    const userId = user[0].dataValues.id;
+
+    const newUserCalendar = await UserCalendar.create({
+      userId: userId,
+      calendarId: calendarId,
+      roleId: 2,
+    });
+
+    await db.Pending.destroy({
+      where: {
+        email: userEmail,
+        calendarId: calendarId,
+      },
+    });
+
+    return res.json(newUserCalendar);
+  } catch (err) {
+    return res.status(400).json({ error: true, msg: err });
+  }
+}
+
 module.exports = {
   getCalendarEvents,
   getEventList,
@@ -133,4 +162,5 @@ module.exports = {
   deleteCalendar,
   sendInvite,
   getInviteDetails,
+  addToUserCalendar,
 };

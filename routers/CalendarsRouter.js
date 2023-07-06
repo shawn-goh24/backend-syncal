@@ -14,5 +14,6 @@ router.delete(
 
 router.get("/invite/:id", calendarsController.getInviteDetails); // Get invite details
 router.post("/invite", calendarsController.sendInvite); // Invite members to calendar
+router.post("/new/usercalendar", calendarsController.addToUserCalendar);
 
 module.exports = router;
