@@ -12,4 +12,7 @@ router.delete(
   calendarsController.deleteCalendar
 ); // Delete a single calander
 
+router.get("/invite/:id", calendarsController.getInviteDetails); // Get invite details
+router.post("/invite", calendarsController.sendInvite); // Invite members to calendar
+
 module.exports = router;

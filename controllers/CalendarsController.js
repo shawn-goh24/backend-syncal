@@ -1,5 +1,7 @@
 const db = require("../db/models/index");
 const { groupByDate } = require("../utils/utils");
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(process.env.SENDGRID_API);
 
 const { User, Event, Calendar, UserCalendar } = db;
 
@@ -88,10 +90,47 @@ async function deleteCalendar(req, res) {
   }
 }
 
+async function sendInvite(req, res) {
+  const { currUser, members, calendar, inviteUrl } = req.body;
+  try {
+    sendEmail(currUser, members, calendar, inviteUrl);
+    return res.json({ msg: "Invited" });
+  } catch (err) {
+    return res.status(400).json({ error: true, msg: err });
+  }
+}
+
+const sendEmail = (currUser, members, calendar, inviteUrl) => {
+  const msg = {
+    to: members,
+    from: currUser.email,
+    subject: `Invitation to ${calendar.name}`,
+    text: `You have been invited to ${calendar.name}. Click on this link to ${inviteUrl} to join.`,
+  };
+  sgMail
+    .send(msg)
+    .then(() => {
+      console.log("Email sent");
+    })
+    .catch((error) => console.log(error));
+};
+
+async function getInviteDetails(req, res) {
+  try {
+    console.log(req.params.id);
+    const calendar = await Calendar.findByPk(req.params.id);
+    return res.json(calendar);
+  } catch (err) {
+    return res.status(400).json({ error: true, msg: err });
+  }
+}
+
 module.exports = {
   getCalendarEvents,
   getEventList,
   addCalendar,
   editCalendar,
   deleteCalendar,
+  sendInvite,
+  getInviteDetails,
 };
