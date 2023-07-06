@@ -6,6 +6,22 @@ sgMail.setApiKey(process.env.SENDGRID_API);
 const { User, Event, Calendar, UserCalendar } = db;
 
 // Get all user (Test Route)
+async function getUserCalendar(req, res) {
+  const { userId, calendarId } = req.params;
+  try {
+    const userCalendar = await Calendar.findByPk(calendarId, {
+      include: {
+        model: User,
+        where: { id: userId },
+      },
+    });
+    return res.json(userCalendar);
+  } catch (err) {
+    return res.status(400).json({ error: true, msg: err });
+  }
+}
+
+// Get all user (Test Route)
 async function getCalendarEvents(req, res) {
   const { id } = req.params;
   try {
@@ -154,7 +170,30 @@ async function addToUserCalendar(req, res) {
   }
 }
 
+async function leaveCalendar(req, res) {
+  const { userId, calendarId } = req.params;
+  try {
+    await UserCalendar.destroy({
+      where: {
+        userId: userId,
+        calendarId: calendarId,
+        roleId: 2,
+      },
+    });
+
+    const allUserCalendar = await User.findByPk(userId, {
+      include: Calendar,
+      order: [[{ model: Calendar }, "id", "ASC"]],
+    });
+
+    return res.json(allUserCalendar);
+  } catch (err) {
+    return res.status(400).json({ error: true, msg: err });
+  }
+}
+
 module.exports = {
+  getUserCalendar,
   getCalendarEvents,
   getEventList,
   addCalendar,
@@ -163,4 +202,5 @@ module.exports = {
   sendInvite,
   getInviteDetails,
   addToUserCalendar,
+  leaveCalendar,
 };
