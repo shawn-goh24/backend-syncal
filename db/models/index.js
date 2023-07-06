@@ -11,6 +11,7 @@ const initEvent = require("./event.js");
 const initUserCalendar = require("./user_calendar.js");
 const initRsvp = require("./rsvp.js");
 const initUserEvent = require("./user_event.js");
+const initPending = require("./pending.js");
 const db = {};
 
 let sequelize;
@@ -33,6 +34,7 @@ db.Event = initEvent(sequelize);
 db.UserCalendar = initUserCalendar(sequelize);
 db.Rsvp = initRsvp(sequelize);
 db.UserEvent = initUserEvent(sequelize);
+db.Pending = initPending(sequelize);
 
 // Calendar - Events (1-M)
 db.Calendar.hasMany(db.Event, {
@@ -54,6 +56,12 @@ db.Calendar.belongsToMany(db.User, { through: db.UserCalendar });
 db.UserCalendar.belongsTo(db.User);
 db.UserCalendar.belongsTo(db.Calendar);
 db.UserCalendar.belongsTo(db.Role);
+
+// Pending - Calendars
+db.Calendar.hasMany(db.Pending, {
+  foreignKey: "calendarId",
+});
+db.Pending.belongsTo(db.Calendar);
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

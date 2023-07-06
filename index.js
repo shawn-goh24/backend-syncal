@@ -14,6 +14,7 @@ const checkJwt = auth({
 const usersRouter = require("./routers/UsersRouter");
 const eventsRouter = require("./routers/EventsRouter");
 const calendarsRouter = require("./routers/CalendarsRouter");
+const pendingsRouter = require("./routers/PendingsRouter");
 
 // enforce on all endpoints
 // get PORT from .env
@@ -22,11 +23,12 @@ const PORT = process.env.PORT;
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(checkJwt);
+// app.use(checkJwt);
 
 app.use("/user", usersRouter);
 app.use("/event", eventsRouter);
 app.use("/calendar", calendarsRouter);
+app.use("/pending", pendingsRouter);
 
 app.listen(PORT, () => {
   console.log(`Application listening to port ${PORT}`);
