@@ -42,7 +42,7 @@ async function getEventList(req, res) {
       include: Event,
       order: [[Event, "start", "ASC"]],
     });
-    console.log("groupedEvents");
+    // console.log("groupedEvents");
     const groupedEvents = groupByDate(calendar.Events);
     return res.json(groupedEvents);
   } catch (err) {
@@ -133,7 +133,7 @@ const sendEmail = (currUser, members, calendar, inviteUrl) => {
 
 async function getInviteDetails(req, res) {
   try {
-    console.log(req.params.id);
+    // console.log(req.params.id);
     const calendar = await Calendar.findByPk(req.params.id);
     return res.json(calendar);
   } catch (err) {

@@ -39,7 +39,7 @@ async function addEvent(req, res) {
 
 async function editEvent(req, res) {
   try {
-    console.log(req.body.editedValues);
+    // console.log(req.body.editedValues);
     const eventToAdd = req.body.editedValues;
     const eventToReplace = req.params.eventId;
     let eventToEdit = await Event.findByPk(eventToReplace);
