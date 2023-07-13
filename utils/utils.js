@@ -31,13 +31,11 @@ const groupByDate = (events) => {
         new Date(item.start),
         new Date(item.end)
       );
+      allDates.pop();
       for (let j = 0; j < allDates.length; j++) {
         const current = results.find((i) => {
-          const splitDate = i.date.split("/");
-          const newDate = `${splitDate[1]}/${splitDate[0]}/${splitDate[2]}`;
-
           return (
-            new Date(newDate).toLocaleDateString() ===
+            new Date(i.date).toLocaleDateString() ===
             new Date(allDates[j]).toLocaleDateString()
           );
         });
@@ -69,7 +67,7 @@ const groupByDate = (events) => {
     return results;
   }, []);
 
-  // console.log("response");
+  // console.log(response);
   return response;
 };
 
