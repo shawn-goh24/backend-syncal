@@ -12,9 +12,9 @@ const { User, Event, Calendar, UserCalendar } = db;
 async function oauthLogin(req, res) {
   try {
     const oauth2Client = new google.auth.OAuth2(
-      "763107087367-ki8cr68hvgmg9kho6d7ph6qlvpafrefj.apps.googleusercontent.com",
-      "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",
-      "http://localhost:3000/home"
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      `${process.env.CLIENT}/home`
     );
     const scopes = ["https://www.googleapis.com/auth/calendar"];
 
@@ -35,10 +35,9 @@ async function getRf(req, res) {
     const res = await axios.post(`https://accounts.google.com/o/oauth2/token`, {
       grant_type: "authorization_code",
       code: req.body.code,
-      client_id:
-        "763107087367-ki8cr68hvgmg9kho6d7ph6qlvpafrefj.apps.googleusercontent.com",
-      client_secret: "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",
-      redirect_uri: "http://localhost:3000/home",
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: `${process.env.CLIENT}/home`,
     });
 
     // console.log(res.data);
@@ -51,32 +50,13 @@ async function getRf(req, res) {
 
 async function getGoogleCalendarList(req, res) {
   const { sub, id } = req.params;
-  // const userId = auth0UserId.replace("%7C", "|");
-  // console.log(sub, id);
   try {
-    // http://localhost:3000/home?code=4%2F0AZEOvhVfmDp4Bewm1VA6YZCefZZbugrjBO_qTj9cgaSzwCUqYfDIJ9FIHnhJYmDM4H_y4A&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar
-
-    // const testing = await axios.get(
-    //   `http://localhost:3000/home/oauthcallback?code={authorizationCode}`
-    // );
-    // console.log(testing.data);
-
-    // const { tokens } = await oauth2Client.getToken(code);
-    // console.log(tokens);
-
-    // const testing = await axios.get(
-    //   `https://dev-e27oql725amd8bwx.us.auth0.com/authorize?response_type=token&client_id=R91sYprWrLnH8ZVQbYtV8AAhyUmgymRR&connection=google-oauth2&redirect_uri=http://localhost:3000/api/auth/callback`
-    // );
-
-    // console.log("Testing : ", testing);
-
     const managementApi = await axios.post(
-      `https://dev-e27oql725amd8bwx.us.auth0.com/oauth/token`,
+      `${process.env.AUTH0_ISSUER_BASE_URL}/oauth/token`,
       {
-        client_id: "R91sYprWrLnH8ZVQbYtV8AAhyUmgymRR",
-        client_secret:
-          "IUAbul5dCEA9VtwyqafTeZj0XqfSNxDOHAyozwktLKe8V-6-xSMrl-Yy48SFFeA_",
-        audience: "https://dev-e27oql725amd8bwx.us.auth0.com/api/v2/",
+        client_id: process.env.AUTH0_CLIENT_ID,
+        client_secret: process.env.AUTH0_CLIENT_SECRET,
+        audience: `${process.env.AUTH0_ISSUER_BASE_URL}/api/v2/`,
         grant_type: "client_credentials",
         // access_type: "offline",
         // scope: scopes,
@@ -88,7 +68,7 @@ async function getGoogleCalendarList(req, res) {
     // console.log(token);
 
     const user = await axios.get(
-      `https://dev-e27oql725amd8bwx.us.auth0.com/api/v2/users/${sub}|${id}`,
+      `${process.env.AUTH0_ISSUER_BASE_URL}/api/v2/users/${sub}|${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -118,19 +98,18 @@ async function getSelectedCalEvents(req, res) {
     const currentUtcDate = zonedTimeToUtc(new Date(), "Asia/Singapore");
 
     const managementApi = await axios.post(
-      `https://dev-e27oql725amd8bwx.us.auth0.com/oauth/token`,
+      `${process.env.AUTH0_ISSUER_BASE_URL}/oauth/token`,
       {
-        client_id: "R91sYprWrLnH8ZVQbYtV8AAhyUmgymRR",
-        client_secret:
-          "IUAbul5dCEA9VtwyqafTeZj0XqfSNxDOHAyozwktLKe8V-6-xSMrl-Yy48SFFeA_",
-        audience: "https://dev-e27oql725amd8bwx.us.auth0.com/api/v2/",
+        client_id: process.env.AUTH0_CLIENT_ID,
+        client_secret: process.env.AUTH0_CLIENT_SECRET,
+        audience: `${process.env.AUTH0_ISSUER_BASE_URL}/api/v2/`,
         grant_type: "client_credentials",
       }
     );
     const token = managementApi.data.access_token;
 
     const user = await axios.get(
-      `https://dev-e27oql725amd8bwx.us.auth0.com/api/v2/users/${sub}|${id}`,
+      `${process.env.AUTH0_ISSUER_BASE_URL}/api/v2/users/${sub}|${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -53,19 +53,18 @@ async function getGroup(req, res) {
 async function testRoute(req, res) {
   try {
     const managementApi = await axios.post(
-      `https://dev-e27oql725amd8bwx.us.auth0.com/oauth/token`,
+      `${process.env.AUTH0_ISSUER_BASE_URL}/oauth/token`,
       {
-        client_id: "R91sYprWrLnH8ZVQbYtV8AAhyUmgymRR",
-        client_secret:
-          "IUAbul5dCEA9VtwyqafTeZj0XqfSNxDOHAyozwktLKe8V-6-xSMrl-Yy48SFFeA_",
-        audience: "https://dev-e27oql725amd8bwx.us.auth0.com/api/v2/",
+        client_id: process.env.AUTH0_CLIENT_ID,
+        client_secret: process.env.AUTH0_CLIENT_SECRET,
+        audience: `${process.env.AUTH0_ISSUER_BASE_URL}/api/v2/`,
         grant_type: "client_credentials",
       }
     );
     const accessToken = managementApi.data.access_token;
 
     const user = await axios.get(
-      `https://dev-e27oql725amd8bwx.us.auth0.com/api/v2/users/google-oauth2|108609696588464248049`,
+      `${process.env.AUTH0_ISSUER_BASE_URL}/api/v2/users/`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,

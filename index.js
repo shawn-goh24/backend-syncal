@@ -6,8 +6,8 @@ require("dotenv").config();
 // Auth0
 const { auth } = require("express-oauth2-jwt-bearer");
 const checkJwt = auth({
-  audience: "https://syncal/api",
-  issuerBaseURL: "https://dev-e27oql725amd8bwx.us.auth0.com/",
+  audience: process.env.AUTH0_AUDIENCE,
+  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
   tokenSigningAlg: "RS256",
 });
 
