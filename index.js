@@ -16,6 +16,7 @@ const eventsRouter = require("./routers/EventsRouter");
 const calendarsRouter = require("./routers/CalendarsRouter");
 const pendingsRouter = require("./routers/PendingsRouter");
 const googleCalRouter = require("./routers/GoogleCalRouter");
+const userCalendarsRouter = require("./routers/UserCalendarsRouter");
 
 // enforce on all endpoints
 // get PORT from .env
@@ -31,6 +32,7 @@ app.use("/event", eventsRouter);
 app.use("/calendar", calendarsRouter);
 app.use("/pending", pendingsRouter);
 app.use("/googleCal", googleCalRouter);
+app.use("/usercalendar", userCalendarsRouter);
 
 app.listen(PORT, () => {
   console.log(`Application listening to port ${PORT}`);
