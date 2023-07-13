@@ -26,6 +26,33 @@ const moment = require("moment");
  **/
 const groupByDate = (events) => {
   const response = events.reduce((results, item) => {
+    if (item.allDay) {
+      const allDates = getDatesInRange(
+        new Date(item.start),
+        new Date(item.end)
+      );
+      for (let j = 0; j < allDates.length; j++) {
+        const current = results.find((i) => {
+          const splitDate = i.date.split("/");
+          const newDate = `${splitDate[1]}/${splitDate[0]}/${splitDate[2]}`;
+
+          return (
+            new Date(newDate).toLocaleDateString() ===
+            new Date(allDates[j]).toLocaleDateString()
+          );
+        });
+        if (current) {
+          current.events.push({ ...item.dataValues });
+        } else {
+          results.push({
+            date: new Date(allDates[j]).toLocaleDateString(),
+            events: [{ ...item.dataValues }],
+          });
+        }
+      }
+      return results;
+    }
+
     const current = results.find(
       (i) =>
         new Date(i.date).toLocaleDateString() ===
@@ -44,6 +71,19 @@ const groupByDate = (events) => {
 
   // console.log("response");
   return response;
+};
+
+const getDatesInRange = (startDate, endDate) => {
+  const date = new Date(startDate.getTime());
+
+  const dates = [];
+
+  while (date <= endDate) {
+    dates.push(new Date(date).toISOString());
+    date.setDate(date.getDate() + 1);
+  }
+
+  return dates;
 };
 
 const getGoogleEventsOnly = (database, google) => {
