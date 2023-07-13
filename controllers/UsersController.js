@@ -25,6 +25,7 @@ async function getUser(req, res) {
         userId: user.id,
         calendarId: newCalendar.id,
         roleId: 1,
+        color: "#00B8D9",
       });
     }
 

@@ -2,6 +2,7 @@ const db = require("../db/models/index");
 const { groupByDate } = require("../utils/utils");
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API);
+const colorOptions = require("../constants");
 
 const { User, Event, Calendar, UserCalendar } = db;
 
@@ -63,6 +64,7 @@ async function addCalendar(req, res) {
       userId: userId,
       calendarId: newCalendar.id,
       roleId: 1,
+      color: "#00B8D9",
     });
 
     return res.json(newCalendar);
@@ -151,10 +153,16 @@ async function addToUserCalendar(req, res) {
     });
     const userId = user[0].dataValues.id;
 
+    const randIndex = Math.floor(Math.random() * 10);
+    // console.log("\n", userEmail, calendarId, "\n");
+    // console.log("\n", randIndex, "\n");
+    // console.log("\n", colorOptions.colorOptions[randIndex].value, "\n");
+
     const newUserCalendar = await UserCalendar.create({
       userId: userId,
       calendarId: calendarId,
       roleId: 2,
+      color: colorOptions.colorOptions[randIndex].value,
     });
 
     await db.Pending.destroy({
