@@ -49,6 +49,20 @@ async function getGroup(req, res) {
   }
 }
 
+// Get calendar associated with user
+async function editUser(req, res) {
+  const { userId } = req.params;
+  try {
+    const name = req.body;
+    const userToReplace = userId;
+    let userToEdit = await User.findByPk(userToReplace);
+    await userToEdit.update(name);
+    return res.json(userToEdit);
+  } catch (err) {
+    return res.status(400).json({ error: true, msg: err });
+  }
+}
+
 // Get all user (Test Route)
 async function testRoute(req, res) {
   try {
@@ -100,4 +114,5 @@ module.exports = {
   testRoute,
   getUser,
   getGroup,
+  editUser,
 };
