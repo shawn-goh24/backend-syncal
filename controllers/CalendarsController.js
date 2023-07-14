@@ -200,6 +200,22 @@ async function leaveCalendar(req, res) {
   }
 }
 
+async function getAllUsersInCalendar(req, res) {
+  const { calendarId } = req.params;
+  try {
+    const users = await Calendar.findAll({
+      where: {
+        id: calendarId,
+      },
+      include: User,
+    });
+
+    return res.json(users);
+  } catch (err) {
+    return res.status(400).json({ error: true, msg: err });
+  }
+}
+
 module.exports = {
   getUserCalendar,
   getCalendarEvents,
@@ -211,4 +227,5 @@ module.exports = {
   getInviteDetails,
   addToUserCalendar,
   leaveCalendar,
+  getAllUsersInCalendar,
 };

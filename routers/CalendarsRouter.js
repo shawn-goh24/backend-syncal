@@ -22,4 +22,6 @@ router.post("/new/usercalendar", calendarsController.addToUserCalendar);
 
 router.delete("/leave/:calendarId/:userId", calendarsController.leaveCalendar);
 
+router.get("/users/:calendarId", calendarsController.getAllUsersInCalendar);
+
 module.exports = router;
