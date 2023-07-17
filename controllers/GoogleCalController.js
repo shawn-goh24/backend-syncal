@@ -153,10 +153,45 @@ async function getSelectedCalEvents(req, res) {
       }
     );
 
+    let googleAt = user.data.identities[0].access_token;
+
+    try {
+      console.log("Check if access_token valid");
+      await axios.get(
+        `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${googleAt}`
+      );
+    } catch (err) {
+      const rft = await User.findByPk(req.params.userId);
+      console.log(rft.dataValues.rft);
+
+      // get rft and get new accesstoken
+      const refreshToken = rft.dataValues.rft;
+      const clientId = process.env.GOOGLE_CLIENT_ID;
+      const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+      const tokenUrl = "https://oauth2.googleapis.com/token";
+
+      const data = {
+        refresh_token: refreshToken,
+        client_id: clientId,
+        client_secret: clientSecret,
+        grant_type: "refresh_token",
+      };
+
+      const response = await axios.post(tokenUrl, null, {
+        params: data,
+      });
+
+      console.log("response", data);
+      console.log("response", response.data.access_token);
+
+      googleAt = response.data.access_token;
+    }
+
     const events = [];
     const fetchPromises = selectedCalendarIds.map(async (item) => {
       const calendarEvent = await fetchGoogleEventList(
-        user.data.identities[0].access_token,
+        googleAt,
         item,
         currentUtcDate,
         dbCalendarId
