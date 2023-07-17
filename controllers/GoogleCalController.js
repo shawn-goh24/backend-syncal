@@ -31,18 +31,21 @@ async function oauthLogin(req, res) {
 
 async function getRf(req, res) {
   try {
-    // console.log(req.body.code);
-    const res = await axios.post(`https://accounts.google.com/o/oauth2/token`, {
-      grant_type: "authorization_code",
-      code: req.body.code,
-      client_id: process.env.GOOGLE_CLIENT_ID,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: `${process.env.CLIENT}/home`,
-    });
+    console.log(req.body.code);
+    const response = await axios.post(
+      `https://accounts.google.com/o/oauth2/token`,
+      {
+        grant_type: "authorization_code",
+        code: req.body.code,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: `${process.env.CLIENT}/home`,
+      }
+    );
 
-    // console.log(res.data);
+    console.log(response);
 
-    return res.json(res.data);
+    return res.json(response.data);
   } catch (err) {
     return res.status(400).json({ error: true, msg: err });
   }
