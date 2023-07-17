@@ -21,6 +21,9 @@ const initUser = (sequelize) =>
       avatarUrl: {
         type: DataTypes.STRING,
       },
+      rft: {
+        type: DataTypes.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,

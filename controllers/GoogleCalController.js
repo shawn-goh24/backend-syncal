@@ -65,7 +65,6 @@ async function getGoogleCalendarList(req, res) {
         // scope: scopes,
       }
     );
-
     // console.log(managementApi.data);
     const token = managementApi.data.access_token;
     // console.log(token);
@@ -79,12 +78,46 @@ async function getGoogleCalendarList(req, res) {
       }
     );
 
+    let googleAt = user.data.identities[0].access_token;
+
+    try {
+      console.log("Check if access_token valid");
+      await axios.get(
+        `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${googleAt}`
+      );
+    } catch (err) {
+      const rft = await User.findByPk(req.params.userId);
+      console.log(rft.dataValues.rft);
+
+      // get rft and get new accesstoken
+      const refreshToken = rft.dataValues.rft;
+      const clientId = process.env.GOOGLE_CLIENT_ID;
+      const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+      const tokenUrl = "https://oauth2.googleapis.com/token";
+
+      const data = {
+        refresh_token: refreshToken,
+        client_id: clientId,
+        client_secret: clientSecret,
+        grant_type: "refresh_token",
+      };
+
+      const response = await axios.post(tokenUrl, null, {
+        params: data,
+      });
+
+      console.log("response", data);
+      console.log("response", response.data.access_token);
+
+      googleAt = response.data.access_token;
+    }
+    // console.log(isAccessTokenExpired);
+
     // console.log(user.data);
     // console.log(user.data.identities[0].access_token);
 
-    const calendarList = await fetchGoogleCalendarList(
-      user.data.identities[0].access_token
-    );
+    const calendarList = await fetchGoogleCalendarList(googleAt);
 
     return res.json(calendarList);
   } catch (err) {
