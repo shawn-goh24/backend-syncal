@@ -53,9 +53,9 @@ async function getRsvpCount(req, res) {
     });
 
     const rsvpCount = {
-      yes: yes,
-      no: no,
-      maybe: maybe,
+      Yes: yes,
+      No: no,
+      Maybe: maybe,
     };
 
     return res.json(rsvpCount);

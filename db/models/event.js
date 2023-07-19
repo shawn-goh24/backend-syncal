@@ -13,6 +13,7 @@ const initEvent = (sequelize) =>
       calendarId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        onDelete: "CASCADE",
         references: {
           model: "calendars",
           key: "id",
