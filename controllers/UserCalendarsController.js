@@ -1,8 +1,8 @@
 const db = require("../db/models/index");
 
-const { UserCalendar, Calendar, User } = db;
+const { UserCalendar } = db;
 
-// Check & get single user
+// Edit color from userscalendar table
 async function editDefaultColor(req, res) {
   const { userId, calendarId } = req.params;
   try {

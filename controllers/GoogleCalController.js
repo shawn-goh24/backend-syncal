@@ -5,10 +5,11 @@ const {
   convertGoogleToDatabaseFormat,
   getGoogleEventsOnly,
 } = require("../utils/utils");
-const { zonedTimeToUtc, utcToZonedTime, format } = require("date-fns-tz");
+const { zonedTimeToUtc } = require("date-fns-tz");
 
-const { User, Event, Calendar, UserCalendar } = db;
+const { User, Event } = db;
 
+// handle get url from google
 async function oauthLogin(req, res) {
   try {
     const oauth2Client = new google.auth.OAuth2(
@@ -29,9 +30,9 @@ async function oauthLogin(req, res) {
   }
 }
 
+// handle get user google details (RF/Access token)
 async function getRf(req, res) {
   try {
-    console.log(req.body.code);
     const response = await axios.post(
       `https://accounts.google.com/o/oauth2/token`,
       {
@@ -43,14 +44,13 @@ async function getRf(req, res) {
       }
     );
 
-    console.log(response);
-
     return res.json(response.data);
   } catch (err) {
     return res.status(400).json({ error: true, msg: err });
   }
 }
 
+// Retreive a list of calendar associated with the user
 async function getGoogleCalendarList(req, res) {
   const { sub, id } = req.params;
   try {
@@ -61,13 +61,9 @@ async function getGoogleCalendarList(req, res) {
         client_secret: process.env.AUTH0_CLIENT_SECRET,
         audience: `${process.env.AUTH0_ISSUER_BASE_URL}/api/v2/`,
         grant_type: "client_credentials",
-        // access_type: "offline",
-        // scope: scopes,
       }
     );
-    // console.log(managementApi.data);
     const token = managementApi.data.access_token;
-    // console.log(token);
 
     const user = await axios.get(
       `${process.env.AUTH0_ISSUER_BASE_URL}/api/v2/users/${sub}|${id}`,
@@ -81,13 +77,11 @@ async function getGoogleCalendarList(req, res) {
     let googleAt = user.data.identities[0].access_token;
 
     try {
-      console.log("Check if access_token valid");
       await axios.get(
         `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${googleAt}`
       );
     } catch (err) {
       const rft = await User.findByPk(req.params.userId);
-      console.log(rft.dataValues.rft);
 
       // get rft and get new accesstoken
       const refreshToken = rft.dataValues.rft;
@@ -107,15 +101,8 @@ async function getGoogleCalendarList(req, res) {
         params: data,
       });
 
-      console.log("response", data);
-      console.log("response", response.data.access_token);
-
       googleAt = response.data.access_token;
     }
-    // console.log(isAccessTokenExpired);
-
-    // console.log(user.data);
-    // console.log(user.data.identities[0].access_token);
 
     const calendarList = await fetchGoogleCalendarList(googleAt);
 
@@ -126,6 +113,7 @@ async function getGoogleCalendarList(req, res) {
   }
 }
 
+// Retreive a list of events associated with the user and calendar
 async function getSelectedCalEvents(req, res) {
   const { selectedCalendarIds, dbCalendarId, event } = req.body;
   const { sub, id } = req.params;
@@ -156,13 +144,11 @@ async function getSelectedCalEvents(req, res) {
     let googleAt = user.data.identities[0].access_token;
 
     try {
-      console.log("Check if access_token valid");
       await axios.get(
         `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${googleAt}`
       );
     } catch (err) {
       const rft = await User.findByPk(req.params.userId);
-      console.log(rft.dataValues.rft);
 
       // get rft and get new accesstoken
       const refreshToken = rft.dataValues.rft;
@@ -181,9 +167,6 @@ async function getSelectedCalEvents(req, res) {
       const response = await axios.post(tokenUrl, null, {
         params: data,
       });
-
-      console.log("response", data);
-      console.log("response", response.data.access_token);
 
       googleAt = response.data.access_token;
     }
@@ -216,19 +199,27 @@ async function getSelectedCalEvents(req, res) {
   }
 }
 
+/**
+ * Function that stores the google events into events db
+ * @param {object} events
+ * @returns {object}
+ */
 async function storeIntoDb(events) {
   try {
-    // console.log("Flat Store into db: ", events.flat());
     let newlyCreatedEvent;
     events.flat().length > 0 &&
       (newlyCreatedEvent = await Event.bulkCreate(events.flat()));
-    console.log(newlyCreatedEvent);
     return newlyCreatedEvent;
   } catch (err) {
     console.log(err);
   }
 }
 
+/**
+ * Function that gets the list of calendar from google
+ * @param {string} accessToken
+ * @returns {object}
+ */
 async function fetchGoogleCalendarList(accessToken) {
   const auth = new google.auth.OAuth2();
 
@@ -240,6 +231,14 @@ async function fetchGoogleCalendarList(accessToken) {
   return calendarList.data.items;
 }
 
+/**
+ * Function that gets all events from starting date from selected google cal
+ * @param {string} accessToken
+ * @param {int} calendarId
+ * @param {date} currentUtcDate
+ * @param {int} dbCalendarId
+ * @returns {object}
+ */
 async function fetchGoogleEventList(
   accessToken,
   calendarId,
@@ -261,7 +260,6 @@ async function fetchGoogleEventList(
     dbCalendarId
   );
 
-  // console.log("events: ", events.data.items);
   return newlyFormattedEvent;
 }
 

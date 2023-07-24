@@ -6,7 +6,7 @@ const colorOptions = require("../constants");
 
 const { User, Event, Calendar, UserCalendar } = db;
 
-// Get all user (Test Route)
+// User associated with calendar
 async function getUserCalendar(req, res) {
   const { userId, calendarId } = req.params;
   try {
@@ -22,7 +22,7 @@ async function getUserCalendar(req, res) {
   }
 }
 
-// Get all user (Test Route)
+// Get all events within calendar
 async function getCalendarEvents(req, res) {
   const { id } = req.params;
   try {
@@ -35,7 +35,7 @@ async function getCalendarEvents(req, res) {
   }
 }
 
-// Get all events arrange and group according to dates & time
+// Get a list of events in calendar and group according to dates
 async function getEventList(req, res) {
   const { id } = req.params;
   try {
@@ -43,7 +43,6 @@ async function getEventList(req, res) {
       include: Event,
       order: [[Event, "start", "ASC"]],
     });
-    // console.log("groupedEvents");
     const groupedEvents = groupByDate(calendar.Events);
     return res.json(groupedEvents);
   } catch (err) {
@@ -92,6 +91,7 @@ async function editCalendar(req, res) {
   }
 }
 
+// Delete calendar
 async function deleteCalendar(req, res) {
   const { calendarId, userId } = req.params;
   try {
@@ -108,6 +108,7 @@ async function deleteCalendar(req, res) {
   }
 }
 
+// send invite to a particular calendar
 async function sendInvite(req, res) {
   const { currUser, members, calendar, inviteUrl } = req.body;
   try {
@@ -118,6 +119,13 @@ async function sendInvite(req, res) {
   }
 }
 
+/**
+ * Function that uses sendgrid to send an email to users
+ * @param {object} currUser
+ * @param {object} members
+ * @param {object} calendar
+ * @param {string} inviteUrl
+ */
 const sendEmail = (currUser, members, calendar, inviteUrl) => {
   const msg = {
     to: members,
@@ -133,9 +141,9 @@ const sendEmail = (currUser, members, calendar, inviteUrl) => {
     .catch((error) => console.log(error));
 };
 
+// get a single calendar
 async function getInviteDetails(req, res) {
   try {
-    // console.log(req.params.id);
     const calendar = await Calendar.findByPk(req.params.id);
     return res.json(calendar);
   } catch (err) {
@@ -143,6 +151,7 @@ async function getInviteDetails(req, res) {
   }
 }
 
+// add user to usercalendar table
 async function addToUserCalendar(req, res) {
   const { userEmail, calendarId } = req.body;
   try {
@@ -153,18 +162,16 @@ async function addToUserCalendar(req, res) {
     });
     const userId = user[0].dataValues.id;
 
-    const randIndex = Math.floor(Math.random() * 10);
-    // console.log("\n", userEmail, calendarId, "\n");
-    // console.log("\n", randIndex, "\n");
-    // console.log("\n", colorOptions.colorOptions[randIndex].value, "\n");
+    const randColorIndex = Math.floor(Math.random() * 10);
 
     const newUserCalendar = await UserCalendar.create({
       userId: userId,
       calendarId: calendarId,
       roleId: 2,
-      color: colorOptions.colorOptions[randIndex].value,
+      color: colorOptions.colorOptions[randColorIndex].value,
     });
 
+    // remove user from pending table
     await db.Pending.destroy({
       where: {
         email: userEmail,
@@ -178,6 +185,7 @@ async function addToUserCalendar(req, res) {
   }
 }
 
+// leave calendar
 async function leaveCalendar(req, res) {
   const { userId, calendarId } = req.params;
   try {
@@ -200,6 +208,7 @@ async function leaveCalendar(req, res) {
   }
 }
 
+// get all users within calendar
 async function getAllUsersInCalendar(req, res) {
   const { calendarId } = req.params;
   try {

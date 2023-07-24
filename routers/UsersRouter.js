@@ -3,9 +3,8 @@ const usersController = require("../controllers/UsersController");
 
 const router = express.Router();
 
-router.get("/", usersController.testRoute); // Test route
-router.post("/", usersController.getUser); // Get logged in user (User ? continue : add to db)
+router.post("/", usersController.getUser); // Check & get single user
 router.get("/group/:id", usersController.getGroup); // Get calendar associated with user
-router.put("/:userId", usersController.editUser);
+router.put("/:userId", usersController.editUser); // Edit user
 
 module.exports = router;

@@ -25,7 +25,7 @@ const PORT = process.env.PORT;
 const app = express();
 app.use(cors());
 app.use(express.json());
-// app.use(checkJwt);
+app.use(checkJwt);
 
 app.use("/user", usersRouter);
 app.use("/event", eventsRouter);

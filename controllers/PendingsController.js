@@ -1,8 +1,8 @@
 const db = require("../db/models/index");
 
-const { User, Calendar, UserCalendar, Pending } = db;
+const { Pending } = db;
 
-// Check & get single user
+// get pending associatedd with user and calendar
 async function getPendings(req, res) {
   const { email, calendarId } = req.params;
   try {
@@ -18,7 +18,7 @@ async function getPendings(req, res) {
   }
 }
 
-// Check & get single user
+// insert user and calendar to pending table
 async function insertPendingInvites(req, res) {
   const { invitees } = req.body;
   try {
@@ -29,6 +29,7 @@ async function insertPendingInvites(req, res) {
   }
 }
 
+// delete pending
 async function deletePending(req, res) {
   const { email, calendarId } = req.params;
   try {

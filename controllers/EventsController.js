@@ -2,6 +2,7 @@ const db = require("../db/models/index");
 
 const { Event, UserEvent, Calendar, User } = db;
 
+// Get userevent table details
 async function getEventWithUser(req, res) {
   const { eventId, userId } = req.params;
   try {
@@ -18,6 +19,7 @@ async function getEventWithUser(req, res) {
   }
 }
 
+// get event associated with user
 async function getUsersInEvent(req, res) {
   const { eventId } = req.params;
   try {
@@ -30,6 +32,7 @@ async function getUsersInEvent(req, res) {
   }
 }
 
+// get rsvp count from the event
 async function getRsvpCount(req, res) {
   const { eventId } = req.params;
   try {
@@ -64,19 +67,17 @@ async function getRsvpCount(req, res) {
   }
 }
 
+// Edit userevent table
 async function editEventWithUser(req, res) {
   const { eventId, userId } = req.params;
   try {
     const rsvpId = req.body;
-    console.log(rsvpId);
     let userEventToEdit = await UserEvent.findOne({
       where: {
         eventId: eventId,
         userId: userId,
       },
     });
-
-    console.log(userEventToEdit);
 
     if (userEventToEdit === null) {
       const newUserEvent = await UserEvent.create({
@@ -99,13 +100,6 @@ async function editEventWithUser(req, res) {
 async function addEvent(req, res) {
   const { newEventValues, calendarId, userId } = req.body;
   try {
-    // const start = newEventValues.allDay
-    //   ? newEventValues.startDate
-    //   : newEventValues.startDateTime;
-    // const end = newEventValues.allDay
-    //   ? newEventValues.endDate
-    //   : newEventValues.endDateTime;
-
     const newEvent = await Event.create({
       calendarId: calendarId,
       color: newEventValues.color,
@@ -130,9 +124,9 @@ async function addEvent(req, res) {
   }
 }
 
+// edit event
 async function editEvent(req, res) {
   try {
-    // console.log(req.body.editedValues);
     const eventToAdd = req.body.editedValues;
     const eventToReplace = req.params.eventId;
     let eventToEdit = await Event.findByPk(eventToReplace);
@@ -142,6 +136,8 @@ async function editEvent(req, res) {
     return res.status(400).json({ error: true, msg: err });
   }
 }
+
+// delete event
 async function deleteEvent(req, res) {
   const { eventId, calendarId } = req.params;
   try {

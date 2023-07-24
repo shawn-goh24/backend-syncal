@@ -1,29 +1,8 @@
-const { zonedTimeToUtc, utcToZonedTime, format } = require("date-fns-tz");
-const sub = require("date-fns/sub");
-const moment = require("moment");
 /**
- * Sequlize will sort events by ascending dates and start time.
- * Send to function to create an array of objects according to date
- * Send back to sequelize to return to client to display
- * Output:
- * [
- *  {
- *    date: 17/06/23,
- *    events: [
- *      {event 1},
- *      {event 2},
- *      {event 3},
- *    ]
- *  },
- *  {
- *    date: 19/06/23,
- *    events: [
- *      {event 4},
- *      {event 5}
- *    ]
- *  },
- * ]
- **/
+ * Function that group the events according to dates into an object
+ * @param {object} events
+ * @returns {object}
+ */
 const groupByDate = (events) => {
   const response = events.reduce((results, item) => {
     if (item.allDay) {
@@ -67,10 +46,15 @@ const groupByDate = (events) => {
     return results;
   }, []);
 
-  // console.log(response);
   return response;
 };
 
+/**
+ * Function that get the range of dates between start and end
+ * @param {date} startDate
+ * @param {date} endDate
+ * @returns {object}
+ */
 const getDatesInRange = (startDate, endDate) => {
   const date = new Date(startDate.getTime());
 
@@ -84,32 +68,15 @@ const getDatesInRange = (startDate, endDate) => {
   return dates;
 };
 
+/**
+ * Function that find non duplicated events between google and database, and return an object with events not inside the database
+ * @param {object} database
+ * @param {object} google
+ * @returns {object}
+ */
 const getGoogleEventsOnly = (database, google) => {
-  // console.log("databse : ", database);
-  // console.log("google : ", google);
   const nonIntersected = google.flat().filter((obj1) => {
-    // obj1.title === "Test 3" &&
-    //   console.log(
-    //     "google",
-    //     obj1.title,
-    //     new Date(obj1.start),
-    //     new Date(obj1.end)
-    //   );
-    // console.log(`\n`);
     return !database.some((obj2) => {
-      // obj2.title === "Test 3" &&
-      //   console.log(
-      //     "database",
-      //     obj2.title,
-      //     new Date(obj2.start),
-      //     new Date(obj2.end)
-      //   );
-
-      // console.log(
-      //   obj1.title === obj2.title &&
-      //     new Date(obj1.start) === new Date(obj2.start) &&
-      //     new Date(obj1.end) === new Date(obj2.end)
-      // );
       return (
         obj1.title == obj2.title &&
         new Date(obj1.start).toLocaleDateString() ==
@@ -119,11 +86,15 @@ const getGoogleEventsOnly = (database, google) => {
       );
     });
   });
-  console.log("Non intersected : ", nonIntersected);
-  // console.log(typeof nonIntersected[0].start);
   return nonIntersected;
 };
 
+/**
+ * Function that formats google event format into database schema
+ * @param {object} google
+ * @param {int} calendarId
+ * @returns {object}
+ */
 const convertGoogleToDatabaseFormat = (google, calendarId) => {
   const formattedEvents = google.map((event) => {
     return {
