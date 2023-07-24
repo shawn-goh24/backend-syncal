@@ -3,6 +3,7 @@ const { groupByDate } = require("../utils/utils");
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API);
 const colorOptions = require("../constants");
+const { Op } = require("sequelize");
 
 const { User, Event, Calendar, UserCalendar } = db;
 
@@ -39,10 +40,24 @@ async function getCalendarEvents(req, res) {
 async function getEventList(req, res) {
   const { id } = req.params;
   try {
-    const calendar = await Calendar.findByPk(id, {
-      include: Event,
-      order: [[Event, "start", "ASC"]],
-    });
+    let calendar;
+    if (req.query.title === undefined) {
+      calendar = await Calendar.findByPk(id, {
+        include: Event,
+        order: [[Event, "start", "ASC"]],
+      });
+    } else {
+      calendar = await Calendar.findByPk(id, {
+        include: {
+          model: Event,
+          where: {
+            title: { [Op.iLike]: `%${req.query.title}%` },
+          },
+          required: false,
+        },
+        order: [[Event, "start", "ASC"]],
+      });
+    }
     const groupedEvents = groupByDate(calendar.Events);
     return res.json(groupedEvents);
   } catch (err) {
