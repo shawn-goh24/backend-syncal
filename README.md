@@ -80,7 +80,9 @@ nodemon index.js
 
 ## Other references
 
-- ERD Image
+### Entity Relationship Diagram (ERD)
+
+<img src="./assets/erd.png" alt="ERD" />
 
 ## Contributors
 
